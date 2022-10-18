@@ -10,12 +10,22 @@ public class PlayerScript : MonoBehaviour
     public float speed;
     public Text score;
     private int scoreValue = 0;
+    public GameObject winTextObject;
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
         score.text = scoreValue.ToString();
+        winTextObject.SetActive(false);
+    }
+
+    void ScoreCheck()
+    {
+        if (scoreValue == 4)
+        {
+            winTextObject.SetActive(true);
+        }
     }
 
     // Update is called once per frame
@@ -34,6 +44,8 @@ public class PlayerScript : MonoBehaviour
             scoreValue++;
             score.text = scoreValue.ToString();
             Destroy(collision.collider.gameObject);
+
+            ScoreCheck();
         }
     }
     private void OnCollisionStay2D(Collision2D collision)
