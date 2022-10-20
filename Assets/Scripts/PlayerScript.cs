@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -10,21 +11,53 @@ public class PlayerScript : MonoBehaviour
     public float speed;
     public Text score;
     private int scoreValue = 0;
+    private int lives = 3;
+    public Text livesText;
     public GameObject winTextObject;
+    public GameObject loseTextObject;
+    public GameObject player;
+    public AudioSource musicSource;
+    public AudioClip musicClipOne;
+    public AudioClip musicClipTwo;
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
+        livesText.text = "Lives: " + lives.ToString();
         score.text = scoreValue.ToString();
         winTextObject.SetActive(false);
+        loseTextObject.SetActive(false);
+        musicSource.clip = musicClipOne;
+        musicSource.Play();
+        musicSource.loop = true;
     }
-
     void ScoreCheck()
     {
         if (scoreValue == 4)
         {
+            transform.position = new Vector2(0.0f, 50f);
+            lives = 3;
+            livesText.text = "Lives: " + lives.ToString();
+            
+        }
+        if (scoreValue == 8)
+        {
             winTextObject.SetActive(true);
+            musicSource.clip = musicClipTwo;
+            musicSource.Play();
+            musicSource.loop = false;
+            Destroy(rd2d);
+        }
+    }
+
+    void KillPlayer()
+    {
+        livesText.text = "Lives: " + lives.ToString();
+        if (lives == 0)
+        {
+            player.SetActive(false);
+            loseTextObject.SetActive(true);
         }
     }
 
@@ -46,6 +79,14 @@ public class PlayerScript : MonoBehaviour
             Destroy(collision.collider.gameObject);
 
             ScoreCheck();
+        }
+        else if (collision.collider.tag == "Enemy")
+        {
+            lives--;
+            livesText.text = "Lives: " + lives.ToString();
+            Destroy(collision.collider.gameObject);
+
+            KillPlayer();
         }
     }
     private void OnCollisionStay2D(Collision2D collision)
