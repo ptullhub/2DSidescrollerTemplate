@@ -8,6 +8,7 @@ public class PlayerScript : MonoBehaviour
 {
 
     private Rigidbody2D rd2d;
+    private bool facingRight = true;
     public float speed;
     public Text score;
     private int scoreValue = 0;
@@ -19,11 +20,17 @@ public class PlayerScript : MonoBehaviour
     public AudioSource musicSource;
     public AudioClip musicClipOne;
     public AudioClip musicClipTwo;
+    private bool isOnGround;
+    public Transform groundcheck;
+    public float checkRadius;
+    public LayerMask allGround;
+    Animator anim;
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         livesText.text = "Lives: " + lives.ToString();
         score.text = scoreValue.ToString();
         winTextObject.SetActive(false);
@@ -51,6 +58,14 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector2 Scaler = transform.localScale;
+        Scaler.x = Scaler.x * -1;
+        transform.localScale = Scaler;
+    }
+
     void KillPlayer()
     {
         livesText.text = "Lives: " + lives.ToString();
@@ -68,6 +83,42 @@ public class PlayerScript : MonoBehaviour
         float vertMovement = Input.GetAxis("Vertical");
 
         rd2d.AddForce(new Vector2(hozMovement * speed, vertMovement * speed));
+
+        isOnGround = Physics2D.OverlapCircle(groundcheck.position, checkRadius, allGround);
+
+        if (facingRight == false && hozMovement > 0)
+        {
+            Flip();
+        }
+        else if (facingRight == true && hozMovement < 0)
+        {
+            Flip();
+        }
+    }
+
+    void Update()
+    {
+        
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            anim.SetInteger("State", 1);
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            anim.SetInteger("State", 0);
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            anim.SetInteger("State", 1);
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            anim.SetInteger("State", 0);
+        }
+        if (isOnGround == false)
+        {
+            anim.SetInteger("State", 3);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -91,7 +142,7 @@ public class PlayerScript : MonoBehaviour
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if(collision.collider.tag == "Ground")
+        if (collision.collider.tag == "Ground" && isOnGround)
         {
             if (Input.GetKey(KeyCode.W))
             {
@@ -99,4 +150,5 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
+
 }
