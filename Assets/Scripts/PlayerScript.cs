@@ -26,7 +26,7 @@ public class PlayerScript : MonoBehaviour
     public LayerMask allGround;
     Animator anim;
 
-    // Start is called before the first frame update
+   
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
@@ -57,7 +57,7 @@ public class PlayerScript : MonoBehaviour
             Destroy(rd2d);
         }
     }
-
+    
     void Flip()
     {
         facingRight = !facingRight;
@@ -76,9 +76,14 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    
     void FixedUpdate()
     {
+        if (isOnGround == false)
+        {
+            anim.SetInteger("State", 3);
+        }
+
         float hozMovement = Input.GetAxis("Horizontal");
         float vertMovement = Input.GetAxis("Vertical");
 
@@ -94,31 +99,32 @@ public class PlayerScript : MonoBehaviour
         {
             Flip();
         }
+        
+
     }
+
+   
 
     void Update()
     {
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                anim.SetInteger("State", 1);
+            }
+            if (Input.GetKeyUp(KeyCode.D))
+            {
+                anim.SetInteger("State", 0);
+            } 
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                anim.SetInteger("State", 1);
+            }
+            if (Input.GetKeyUp(KeyCode.A))
+            {
+                anim.SetInteger("State", 0);
+            }
         
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            anim.SetInteger("State", 1);
-        }
-        if (Input.GetKeyUp(KeyCode.D))
-        {
-            anim.SetInteger("State", 0);
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            anim.SetInteger("State", 1);
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            anim.SetInteger("State", 0);
-        }
-        if (isOnGround == false)
-        {
-            anim.SetInteger("State", 3);
-        }
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -139,6 +145,10 @@ public class PlayerScript : MonoBehaviour
 
             KillPlayer();
         }
+        if (collision.collider.tag == "Ground" && isOnGround)
+        {
+            anim.SetInteger("State", 0);
+        }
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -150,5 +160,4 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
-
 }
